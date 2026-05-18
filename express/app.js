@@ -3,6 +3,7 @@ import express from "express"
 
 const app = express()
 const PORT = 3000;
+app.use(express.json()) // express middleware
 // route
 app.get("/",(req,res)=>{
     return res.end("This is Home page with the help of express js")
@@ -83,9 +84,21 @@ app.get("/search",(req , res)=>{
     let query = req.query
     console.log(query);
     
-     return res.end('this is query peramiter page ')
-    
-     
+     return res.end('this is query peramiter page ')    
+})
+
+// custom middleware
+let password = 1234
+app.use((req ,res ,next)=>{
+  if(req.body.password !== password){
+    res.send("invalid credentials")
+  }
+  next()
+})
+app.post("/middleware" ,(req ,res)=>{
+  console.log(req.body);
+  return res.send({success : true})
+  
 })
 //server is listing or creating first server
 app.listen(PORT,()=>{
