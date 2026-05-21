@@ -73,8 +73,8 @@ app.put("/update", async (req, res) => {
     let { name, userName } = req.body;
     let id = req.params.id;
     const user = await User.updateOne(
-      { name },
-      { userName },
+      { name }, // update by name
+      { userName },//` update username
       { returnDocument: "after" },
     );
     res.status(201).json(user, { massageL: "update successfully" });
