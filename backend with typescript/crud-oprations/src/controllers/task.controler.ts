@@ -78,3 +78,18 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
         });
     }
 }
+export const allTasks = async (req: Request, res: Response): Promise<void> => {
+    try {
+       const all = await Task.find()
+       res.status(200).json({
+      success: true,
+      total: all.length,
+      data: all,
+    });
+    } catch (error:any) {
+        res.status(500).json({
+            success: false,
+            message: `Internal server error: ${error.message}`,
+        });
+    }
+}
