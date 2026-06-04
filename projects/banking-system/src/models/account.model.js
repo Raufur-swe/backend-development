@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 
-
+// account model is the main model of the banking system. it is used to store the information of the user and their account status. it is also used to link the user with their transactions and ledger entries. it is a reference for the user to know their account status and transactions.
 const accountSchema = new mongoose.Schema({
     user :{
         type : mongoose.Schema.Types.ObjectId,
@@ -25,6 +25,7 @@ const accountSchema = new mongoose.Schema({
     timestamps : true
 })
 
-accountSchema.index({user : 1 , status : 1})
+accountSchema.index({user : 1 , status : 1}) // for fast searching a user by id and status
+
 const accountModel = mongoose.model("account" , accountSchema)
 export default accountModel
