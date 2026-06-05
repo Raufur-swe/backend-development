@@ -1,5 +1,7 @@
+import mongoose from "mongoose"
 import accountModel from "../models/account.model.js"
 import transactionModel from "../models/transaction.model.js"
+import ledgerModel from "../models/ledger.model.js"
 
 const transactionController = {
    
@@ -7,10 +9,10 @@ const transactionController = {
     async creatTransaction(req, res) {
         
         // collect info from req.body
-        const { fromAccount, toAccount, ammount, idempotencyKey } = req.body
+        const { fromAccount, toAccount, amount, idempotencyKey } = req.body
         
         //check all required field
-        if (!fromAccount  || !toAccount || !ammount  ||!idempotencyKey) {
+        if (!fromAccount  || !toAccount || !amount  ||!idempotencyKey) {
             return res.status(400).json({
                 message: "invalid transection"
             })
@@ -76,8 +78,47 @@ const transactionController = {
         }
 
         // check the balance of from account
+        const balance = await fromUserAccount.getBalance()
+        if(balance < amount){
+            res.status(400).json({
+                message : `insufficient balance in from account. current balance is ${balance}`
+            })
+        }
+
+        // create a transection
+
+        const session  = await new mongoose.startSession()
+        session.startSession()
+
+        const transaction = await transactionModel.create({
+            fromAccount ,
+            toAccount,
+            amount,
+            idempotencyKey,
+            status : "pending"
+        },{session})
+
+        const debitLedgerEntry = await ledgerModel.create({
+            account : fromAccount,
+            amount : amount,
+            transaction : transaction._id,
+            type : "debit"
+
+        },{session})
+        const creditLedgerEntry = await ledgerModel.create({
+            account : toAccount,
+            amount : amount,
+            transaction : transaction._id,
+            type : "credit"
+
+        },{session})
+        transaction.status = "completed"
+        await transaction.save({session})
+
+        await session.commitTransaction()
+        session.endSession()
     }
 
 }
 
-export default transectionController
+export default transactionController

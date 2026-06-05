@@ -1,6 +1,10 @@
 import express from "express"
 import authMiddleware from "../middleware/auth.middlewarer.js"
+import transactionController from "../controllers/transaction.controller.js"
 
-const transaction = express.Router()
+const router = express.Router()
 
-transaction.post("/" , authMiddleware)
+router.post("/" , authMiddleware ,  transactionController.creatTransaction)
+
+export default router
+

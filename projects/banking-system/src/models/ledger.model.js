@@ -13,9 +13,9 @@ const ledgerSchema = new mongoose.Schema({
         immutable: true // once a ledger entry is created it cannot be changed
 
     },
-    ammount: {
+    amount: {
         type: Number,
-        required: [true, "Ammount is required"],
+        required: [true, "Amount is required"],
         immutable: true
     },
     transaction: {
