@@ -20,6 +20,14 @@ const userShema = new mongoose.Schema({
         required :[true , "password requires"],
         minlength : [6 , "password should contain more then 6 carecter "],
         select : false
+    },
+
+    // this system user is used for admin and super admin to create and manage other users
+    systemUser :{
+        type : Boolean,
+        default : false,
+        immutable : true,
+        select : false, // this field will not be returned in query results by default . we can change it from database
     }
     
 },{
