@@ -1,7 +1,12 @@
-import { codec } from "zod"
+import { codec, json } from "zod"
 import { registrationSchema } from "../config/zod.js"
 import TryCatch from "../middlewars/TryCatch.middleware.js"
 import sanitize from "mongo-sanitize"
+import { redisClient } from "../index.js"
+import mongoose from "mongoose"
+import { userModel } from "../models/User.model.js"
+import bcrypt from "bcrypt"
+import crypto from"crypto"
 
 const authController = {
 
@@ -28,7 +33,43 @@ const authController = {
     });
 }
 
-        const { name, email, password } = validation.data
+
+const { name, email, password } = validation.data
+
+//impliments rate limits
+const rateLlimitKey = `rergister-rate-limit:${req.ip}:${email}`
+if(await redisClient.get(rateLlimitKey)){
+    return res.status(429).json({
+        message : "Too many request , try again later"
+    })
+}
+
+// find existing email
+ const existUser = await userModel.findOne({email})
+ if(existUser){
+    return res.status(400),json({
+        message : "email already exists"
+    })
+ }
+ 
+ //hash password
+ const hashPassword = await bcrypt.hash(password ,10)
+
+ //create a verify token
+
+ const verifyToken = crypto.randomBytes(32).toString("hex")
+
+ const verifyKey = `verify${verifyToken}` 
+
+ const dataStore =JSON.stringify({
+    name,
+    email,
+    password : hashPassword,
+ })
+
+// send data and key to raddis for just 3min
+await redisClient.set(verifyKey , dataStore,{EX : 300});
+
         res.json({
             email,
             name,
