@@ -18,8 +18,8 @@ import UserRoutes from "./routes/user.routes.js"
 app.use("/api/auth" , UserRoutes)
 
 const PORT = process.env.PORT || 5000
-app.listen(()=>{
-    console.log(`server is running at the port${PORT}`)
+app.listen(PORT,()=>{
+    console.log(`server is running at the port ${PORT}`)
     
 })
 
