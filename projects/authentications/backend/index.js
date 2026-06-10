@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import dns from "dns"
 import connectDb from "./config/db.js"
 import { createClient } from "redis"
+import cookieParser from "cookie-parser"
 
 // dns server
 dns.setServers(["1.1.1.1" , "8.8.8.8"])
@@ -26,7 +27,9 @@ redisClient.connect().then(()=>console.log("redis conncted")).catch(console.erro
 
 //define express and json
 const app = express()
+
 app.use(express.json())
+app.use(cookieParser())
 
 // import routes
 import UserRoutes from "./routes/user.routes.js"

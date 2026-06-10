@@ -9,6 +9,7 @@ import bcrypt from "bcrypt"
 import crypto from "crypto"
 import sendMail from "../config/sendMail.js"
 import { getOtpHtml, getVerifyEmailHtml } from "../config/html.js"
+import { genarateToken } from "../config/generateToken.js"
 
 const authController = {
 
@@ -241,7 +242,7 @@ const authController = {
             })
         }
 
-        const otpKey = `otp : ${email}`
+        const otpKey = `otp:${email}`
 
         const storedOtpString = await redisClient.get(otpKey);
 
@@ -259,9 +260,24 @@ const authController = {
             })
         }
 
-        await redisClient.del(otpKey);
+       
 
         let user = await userModel.findOne({email})
+
+        const tokenData = await genarateToken(user._id ,res);
+        
+        await redisClient.del(otpKey);
+       
+        res.status(200).json({
+            message : `welcome : ${user.name}`,
+            user
+        })
+    }),
+
+    // authenticate user
+    authenticateUser : TryCatch(async(req , res)=>{
+        const user = req.user
+        res.json(user)
     })
 }
 
