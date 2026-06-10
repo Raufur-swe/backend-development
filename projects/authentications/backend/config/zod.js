@@ -6,3 +6,7 @@ export const registrationSchema = z.object({
     email: z.string().email("invalid email"),
     password: z.string().min(6, "invalid password , must be 6 carecter or more")
 })
+export const loginSchema = z.object({
+    email: z.string().email("invalid email"),
+    password: z.string().min(6, "invalid password , must be 6 carecter or more")
+})

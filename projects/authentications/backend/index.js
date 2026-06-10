@@ -36,7 +36,7 @@ app.use("/api/auth" , UserRoutes)
 //connect server
 const PORT = process.env.PORT || 5000
 app.listen(PORT,()=>{
-    console.log(`server is running at the port ${PORT}`)
+    console.log(`server is running at the port:${PORT}`)
     
 })
 
