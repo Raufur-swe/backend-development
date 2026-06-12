@@ -9,7 +9,7 @@ import bcrypt from "bcrypt"
 import crypto from "crypto"
 import sendMail from "../config/sendMail.js"
 import { getOtpHtml, getVerifyEmailHtml } from "../config/html.js"
-import { genarateToken } from "../config/generateToken.js"
+import { genarateAccessToken, genarateToken, revokeRefreshToken, verifyRefreshToken } from "../config/generateToken.js"
 
 const authController = {
 
@@ -278,7 +278,50 @@ const authController = {
     authenticateUser : TryCatch(async(req , res)=>{
         const user = req.user
         res.json(user)
+    }),
+
+    // refresh tokn
+
+    refreshToken : TryCatch(async(req,res)=>{
+        const refreshToken = req.cookies.refreshToken;
+
+        if(!refreshToken){
+            return res.status(401).json({
+                message : "invalid refresh token",
+            })
+        }
+
+        const decode = await verifyRefreshToken(refreshToken);
+        if (!decode) {
+            return res.status(401).json({
+                message : "INvalid refresh Token"
+            })
+        }
+        
+        genarateAccessToken(decode.id.res);
+
+        res.status(200).json({
+            message : "Token refreshed"
+        })
+    }),
+
+    //logout
+
+    logOut : TryCatch(async(req,res)=>{
+        const userId = req.user._id;
+
+        await revokeRefreshToken(userId)
+
+        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken");
+
+        await redisClient.del(`user:${userId}`)
+
+        res.json({
+            message :"Looged out successfully"
+        })
     })
+
 }
 
 export default authController

@@ -9,5 +9,7 @@ router.post("/verify/:token" , authController.verifyUSer)
 router.post("/login" , authController.loginUser)
 router.post("/verify" , authController.verifyOtp)
 router.get("/me" , isAuth , authController.authenticateUser)
+router.post("/refresh" , authController.refreshToken)
+router.post("/logout" , isAuth , authController.logOut)
 
 export default router
