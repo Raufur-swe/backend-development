@@ -1,13 +1,35 @@
 import React, { useState } from 'react'
+import axios from "axios"
+import { serverUrl } from '../main'
+import { toast } from 'react-toastify'
+import { Link } from 'react-router-dom'
 
 const Registration = () => {
-  const [name , setName] = useState("")
-  const [password , setPassword] = useState("")
-  const [email , setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("")
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(`${serverUrl}/api/auth/register`, { name, email, password })
+
+      toast.success(data.message)
+
+    } catch (error) {
+      const errors = error.response?.data?.errors;
+
+      if (errors && errors.length > 0) {
+        toast.error(errors[0].message);
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-lg overflow-hidden grid md:grid-cols-2">
-        
+
         {/* Left Side */}
         <div className="hidden md:flex bg-indigo-600 text-white p-10 flex-col justify-center">
           <h1 className="text-4xl font-bold mb-4">
@@ -28,7 +50,7 @@ const Registration = () => {
               Fill in your details to get started.
             </p>
 
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
@@ -37,6 +59,8 @@ const Registration = () => {
                   type="text"
                   placeholder="John Doe"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
 
@@ -48,6 +72,8 @@ const Registration = () => {
                   type="email"
                   placeholder="john@example.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -59,6 +85,8 @@ const Registration = () => {
                   type="password"
                   placeholder="••••••••"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
@@ -72,12 +100,12 @@ const Registration = () => {
 
             <p className="text-center text-gray-500 mt-6">
               Already have an account?{" "}
-              <a
-                href="#"
+              <Link
+                to="/login"
                 className="text-indigo-600 font-medium hover:underline"
               >
                 Sign In
-              </a>
+              </Link>
             </p>
           </div>
         </div>
